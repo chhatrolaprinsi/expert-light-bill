@@ -1,7 +1,6 @@
 {
-  "name": "EXPERT LIGHT Billing App",
-  "short_name": "Expert Light",
-  "description": "Daily Debit Memo and Sales Bill Generator for Expert Light",
+  "name": "EXPERT LIGHT",
+  "short_name": "EXPERT LIGHT",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -10,12 +9,14 @@
     {
       "src": "icon.png",
       "sizes": "192x192",
-      "type": "image/jpg"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/jpg"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
