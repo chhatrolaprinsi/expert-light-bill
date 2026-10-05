@@ -381,7 +381,9 @@
       html2pdf().set(opt).from(element).save();
     }
 
-    window.onload = () => {
+ window.onload = () => {
+
+  // Always set today's date when page opens
   document.getElementById('billDate').value = getTodayFormatted();
 
   const saved = localStorage.getItem('expert_light_last_bill');
@@ -398,7 +400,7 @@
       document.getElementById('billDate').value = getTodayFormatted();
 
       document.getElementById('oldBalance').value = d.oldBal || "0.00";
-      document.getElementById('memoNote').value = d.note || '';
+      document.getElementById('memoNote').value = d.note || "";
 
       if (d.items && d.items.length) {
         items = d.items;
@@ -409,20 +411,30 @@
     }
   }
 
+  // Render page
   renderEditor();
   saveAndRender();
   lucide.createIcons();
 
-  // Automatically check for a new day every 1 minute
+  // Automatically check date every 1 minute
   setInterval(() => {
+
     const currentDate = getTodayFormatted();
     const dateInput = document.getElementById('billDate');
 
     if (dateInput.value !== currentDate) {
+
+      // New day detected
       dateInput.value = currentDate;
+
+      // Save and update preview
       saveAndRender();
+
+      console.log("Date automatically updated to:", currentDate);
     }
-  }, 60000);
+
+  }, 60000); // 60 seconds
+
 };
   </script>
 </body>
