@@ -382,24 +382,48 @@
     }
 
     window.onload = () => {
+  document.getElementById('billDate').value = getTodayFormatted();
+
+  const saved = localStorage.getItem('expert_light_last_bill');
+
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+
+      document.getElementById('custNamePhone').value = d.name || "";
+      document.getElementById('custCity').value = d.city || "RAJKOT";
+      document.getElementById('billNo').value = d.billNo || "EEL-2674";
+
+      // Always use today's date
       document.getElementById('billDate').value = getTodayFormatted();
-      const saved = localStorage.getItem('expert_light_last_bill');
-      if (saved) {
-        try {
-          const d = JSON.parse(saved);
-          document.getElementById('custNamePhone').value = d.name;
-          document.getElementById('custCity').value = d.city;
-          document.getElementById('billNo').value = d.billNo;
-          document.getElementById('billDate').value = d.date || getTodayFormatted();
-          document.getElementById('oldBalance').value = d.oldBal;
-          document.getElementById('memoNote').value = d.note || '';
-          if (d.items && d.items.length) items = d.items;
-        } catch (e) {}
+
+      document.getElementById('oldBalance').value = d.oldBal || "0.00";
+      document.getElementById('memoNote').value = d.note || '';
+
+      if (d.items && d.items.length) {
+        items = d.items;
       }
-      renderEditor();
+
+    } catch (e) {
+      console.log("Error loading saved data:", e);
+    }
+  }
+
+  renderEditor();
+  saveAndRender();
+  lucide.createIcons();
+
+  // Automatically check for a new day every 1 minute
+  setInterval(() => {
+    const currentDate = getTodayFormatted();
+    const dateInput = document.getElementById('billDate');
+
+    if (dateInput.value !== currentDate) {
+      dateInput.value = currentDate;
       saveAndRender();
-      lucide.createIcons();
-    };
+    }
+  }, 60000);
+};
   </script>
 </body>
 </html>
