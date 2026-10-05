@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EXPERT LIGHT - Billing App</title>
 
-  <!-- PWA & Mobile App Icon Configuration -->
+  <!-- PWA & Mobile App Settings -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="icon.png" />
   <link rel="apple-touch-icon" href="icon.png" />
@@ -13,15 +13,15 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Tailwind CSS & Lucide Icons -->
+  <!-- Tailwind CSS & Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- html2pdf.js -->
+  <!-- PDF Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     @media print {
-      body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+      body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
       .no-print { display: none !important; }
       #printArea { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 0 !important; }
     }
@@ -30,7 +30,7 @@
 </head>
 <body class="bg-slate-100 text-gray-900 font-sans min-h-screen">
 
-  <!-- Header with App Logo Icon -->
+  <!-- Header -->
   <header class="bg-black text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 no-print shadow">
     <div class="flex items-center space-x-2.5">
       <img src="icon.png" alt="App Icon" class="w-7 h-7 rounded object-contain bg-white p-0.5" onerror="this.style.display='none'" />
@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <!-- Product Items Card -->
+      <!-- Products Card -->
       <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b pb-2">
           <h2 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center">
@@ -96,9 +96,7 @@
             <i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add Product
           </button>
         </div>
-        <div id="itemsContainer" class="space-y-3">
-          <!-- Injected dynamically -->
-        </div>
+        <div id="itemsContainer" class="space-y-3"></div>
       </div>
 
     </div>
@@ -164,7 +162,7 @@
               </table>
             </div>
 
-            <!-- Amount in words & Sub Total -->
+            <!-- Words & Subtotal -->
             <div class="border-x border-b border-black flex text-[10.5px]">
               <div class="w-8/12 px-2 py-1 flex items-center border-r border-black">
                 <span class="font-bold mr-1">Rs. (in words) :</span>
@@ -224,13 +222,13 @@
       { name: "RGB ROPE LED LIGHT", qty: 1.000, rate: 260.00 }
     ];
 
-    // Live Date Function (always returns today in DD/MM/YYYY)
+    // Live Date Generator
     function getTodayFormatted() {
-      const d = new Date();
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      const now = new Date();
+      const d = String(now.getDate()).padStart(2, '0');
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const y = now.getFullYear();
+      return `${d}/${m}/${y}`;
     }
 
     function numberToWords(num) {
@@ -241,21 +239,11 @@
         let nArr = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
         if (!nArr) return '';
         let str = '';
-        str += (nArr[1] != 0) ? (a[Number(nArr[1])] || b[nArr[1][0]] + ' ' + a[nArr[1][1]]) + 'Crore ' : '';
-        str += (nArr[2] != 0) ? (aTo make the bill date always update to today's live date automatically whenever you open the app or click **New Bill**, update your script so it always pulls the device's current date instead of falling back to a previously saved date.
+        str += (nArr[1] != 0) ? (a[Number(nArr[1])] || b[nArr[1][0]] + ' ' + a[nArr[1][1]]) + 'CroFollow these step-by-step instructions to update your file on GitHub directly using your web browser:
 
 ---
 
-### Step 1: Update the Date Function in `index.html`
-
-In your `index.html` on GitHub, replace the date helper and startup logic inside `<script>` with this:
-
-```javascript
-// Automatically generates today's real-time date in DD/MM/YYYY format
-function getTodayFormatted() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+### Step 1: Open Your Repository on GitHub
+1. Open your browser and go to your repository:
+   ```text
+   [https://github.com/chhatrolaprinsi/expert-light-bill](https://github.com/chhatrolaprinsi/expert-light-bill)
