@@ -70,7 +70,7 @@
             <input type="text" id="billNo" value="EEL-2674" class="w-full text-xs p-2 border border-gray-300 rounded font-semibold focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Date</label>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Date (Auto Live)</label>
             <input type="text" id="billDate" class="w-full text-xs p-2 border border-gray-300 rounded font-semibold focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
           </div>
         </div>
@@ -103,13 +103,13 @@
 
     </div>
 
-    <!-- RIGHT PDF PREVIEW (CLEAN, NO LOGO IN BILL) -->
+    <!-- RIGHT PDF PREVIEW -->
     <div class="lg:col-span-8 flex justify-center">
       <div id="printArea" class="bg-white w-full max-w-[880px] p-6 shadow-md border border-gray-300 text-black bill-font">
         
         <div class="border border-black p-3 min-h-[920px] flex flex-col justify-between">
           <div>
-            <!-- Top Header (Clean original layout) -->
+            <!-- Top Header -->
             <div class="relative flex items-center justify-center border-b border-black pb-2 mb-2">
               <span class="absolute left-1 text-[11px] font-bold">Debit Memo</span>
               <span class="text-xl font-bold tracking-wider">EXPERT LIGHT</span>
@@ -224,9 +224,13 @@
       { name: "RGB ROPE LED LIGHT", qty: 1.000, rate: 260.00 }
     ];
 
+    // Live Date Function (always returns today in DD/MM/YYYY)
     function getTodayFormatted() {
       const d = new Date();
-      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
     }
 
     function numberToWords(num) {
@@ -238,168 +242,20 @@
         if (!nArr) return '';
         let str = '';
         str += (nArr[1] != 0) ? (a[Number(nArr[1])] || b[nArr[1][0]] + ' ' + a[nArr[1][1]]) + 'Crore ' : '';
-        str += (nArr[2] != 0) ? (a[Number(nArr[2])] || b[nArr[2][0]] + ' ' + a[nArr[2][1]]) + 'Lakh ' : '';
-        str += (nArr[3] != 0) ? (a[Number(nArr[3])] || b[nArr[3][0]] + ' ' + a[nArr[3][1]]) + 'Thousand ' : '';
-        str += (nArr[4] != 0) ? (a[Number(nArr[4])] || b[nArr[4][0]] + ' ' + a[nArr[4][1]]) + 'Hundred ' : '';
-        str += (nArr[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(nArr[5])] || b[nArr[5][0]] + ' ' + a[nArr[5][1]]) : '';
-        return str.trim();
-      }
-      const intVal = Math.round(num);
-      return intVal === 0 ? 'Zero Only' : inWords(intVal) + ' Only';
-    }
+        str += (nArr[2] != 0) ? (aTo make the bill date always update to today's live date automatically whenever you open the app or click **New Bill**, update your script so it always pulls the device's current date instead of falling back to a previously saved date.
 
-    function renderEditor() {
-      const c = document.getElementById('itemsContainer');
-      c.innerHTML = '';
-      items.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'p-3 bg-gray-50 border border-gray-300 rounded space-y-2';
-        div.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold">Item #${i+1}</span>
-            ${items.length > 1 ? `<button onclick="removeItem(${i})" class="text-red-600 hover:text-red-800 text-xs font-bold flex items-center"><i data-lucide="trash-2" class="w-3.5 h-3.5 mr-0.5"></i> Delete</button>` : ''}
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-gray-600">Product Name</label>
-            <input type="text" value="${item.name}" oninput="updateItem(${i}, 'name', this.value)" class="w-full text-xs p-1.5 border border-gray-300 rounded uppercase font-semibold focus:ring-1 focus:ring-black outline-none" />
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[11px] font-semibold text-gray-600">Qty</label>
-              <input type="number" step="any" value="${item.qty}" oninput="updateItem(${i}, 'qty', this.value)" class="w-full text-xs p-1.5 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-black outline-none" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-gray-600">Rate (₹)</label>
-              <input type="number" step="any" value="${item.rate}" oninput="updateItem(${i}, 'rate', this.value)" class="w-full text-xs p-1.5 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-black outline-none" />
-            </div>
-          </div>
-        `;
-        c.appendChild(div);
-      });
-      lucide.createIcons();
-    }
+---
 
-    function addItem() {
-      items.push({ name: "", qty: 1, rate: 0 });
-      renderEditor();
-      saveAndRender();
-    }
+### Step 1: Update the Date Function in `index.html`
 
-    function removeItem(i) {
-      if (items.length > 1) {
-        items.splice(i, 1);
-        renderEditor();
-        saveAndRender();
-      }
-    }
+In your `index.html` on GitHub, replace the date helper and startup logic inside `<script>` with this:
 
-    function updateItem(i, k, v) {
-      items[i][k] = (k === 'qty' || k === 'rate') ? (parseFloat(v) || 0) : v;
-      saveAndRender();
-    }
-
-    function saveAndRender() {
-      const data = {
-        name: document.getElementById('custNamePhone').value,
-        city: document.getElementById('custCity').value,
-        billNo: document.getElementById('billNo').value,
-        date: document.getElementById('billDate').value,
-        oldBal: document.getElementById('oldBalance').value,
-        note: document.getElementById('memoNote').value,
-        items: items
-      };
-      localStorage.setItem('expert_light_last_bill', JSON.stringify(data));
-
-      document.getElementById('pvCustNamePhone').textContent = data.name || '-';
-      document.getElementById('pvCustCity').textContent = data.city || '-';
-      document.getElementById('pvBillNo').textContent = data.billNo || '-';
-      document.getElementById('pvBillDate').textContent = data.date || '-';
-      document.getElementById('pvNote').textContent = data.note || '';
-
-      const tbody = document.getElementById('pvItemsBody');
-      tbody.innerHTML = '';
-      let subtotal = 0;
-
-      items.forEach((item, i) => {
-        const rowTotal = (item.qty || 0) * (item.rate || 0);
-        subtotal += rowTotal;
-        const tr = document.createElement('tr');
-        tr.className = 'text-center';
-        tr.innerHTML = `
-          <td class="border-r border-black py-1">${i + 1}</td>
-          <td class="border-r border-black py-1 px-2 text-left uppercase font-normal">${item.name}</td>
-          <td class="border-r border-black py-1">${Number(item.qty).toFixed(3)}</td>
-          <td class="border-r border-black py-1">${Number(item.rate).toFixed(2)}</td>
-          <td class="border-r border-black py-1"></td>
-          <td class="border-r border-black py-1"></td>
-          <td class="py-1 px-2 text-right">${rowTotal.toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const grandTotal = Math.round(subtotal);
-      const roundOff = grandTotal - subtotal;
-      const oldBal = parseFloat(data.oldBal) || 0;
-      const netBal = oldBal + grandTotal;
-
-      document.getElementById('pvSubTotal').textContent = subtotal.toFixed(2);
-      document.getElementById('pvRoundOff').textContent = (roundOff >= 0 ? '+' : '') + roundOff.toFixed(2);
-      document.getElementById('pvGrandTotal').textContent = grandTotal.toFixed(2);
-      document.getElementById('pvAmountInWords').textContent = numberToWords(grandTotal);
-
-      document.getElementById('pvOldBalance').textContent = oldBal.toFixed(2);
-      document.getElementById('pvThisBill').textContent = grandTotal.toFixed(2);
-      document.getElementById('pvNetBalance').textContent = netBal.toFixed(2);
-    }
-
-    function newBill() {
-      const curNo = document.getElementById('billNo').value;
-      const match = curNo.match(/^(.*?)(\d+)$/);
-      if (match) {
-        const nextNum = parseInt(match[2]) + 1;
-        document.getElementById('billNo').value = `${match[1]}${nextNum}`;
-      }
-      document.getElementById('billDate').value = getTodayFormatted();
-      document.getElementById('custNamePhone').value = "";
-      document.getElementById('oldBalance').value = "0.00";
-      document.getElementById('memoNote').value = "";
-      items = [{ name: "", qty: 1, rate: 0 }];
-      renderEditor();
-      saveAndRender();
-    }
-
-    function downloadPDF() {
-      const element = document.getElementById('printArea');
-      const billNo = document.getElementById('billNo').value || 'DebitMemo';
-      const opt = {
-        margin: [4, 6, 4, 6],
-        filename: `SalesBill_${billNo}.pdf`,
-        image: { type: 'jpeg', quality: 0.99 },
-        html2canvas: { scale: 3, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
-    window.onload = () => {
-      document.getElementById('billDate').value = getTodayFormatted();
-      const saved = localStorage.getItem('expert_light_last_bill');
-      if (saved) {
-        try {
-          const d = JSON.parse(saved);
-          document.getElementById('custNamePhone').value = d.name;
-          document.getElementById('custCity').value = d.city;
-          document.getElementById('billNo').value = d.billNo;
-          document.getElementById('billDate').value = d.date || getTodayFormatted();
-          document.getElementById('oldBalance').value = d.oldBal;
-          document.getElementById('memoNote').value = d.note || '';
-          if (d.items && d.items.length) items = d.items;
-        } catch (e) {}
-      }
-      renderEditor();
-      saveAndRender();
-      lucide.createIcons();
-    };
-  </script>
-</body>
-</html>
+```javascript
+// Automatically generates today's real-time date in DD/MM/YYYY format
+function getTodayFormatted() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  return `${day}/${month}/${year}`;
+}
