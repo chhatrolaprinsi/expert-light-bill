@@ -47,7 +47,7 @@
   <!-- Shared Catalog Datalist for Fast Autofill -->
   <datalist id="catalogList"></datalist>
 
-  <!-- Header with WhatsApp, New Bill & Download PDF -->
+  <!-- Header with New Bill & Download PDF (WhatsApp button removed) -->
   <header class="bg-black text-white px-4 py-3 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 no-print shadow">
     <div class="flex items-center space-x-2.5">
       <img src="icon.png" alt="App Icon" class="w-7 h-7 rounded object-contain bg-white p-0.5" onerror="this.style.display='none'" />
@@ -55,11 +55,6 @@
     </div>
     
     <div class="flex items-center space-x-2">
-      <!-- Direct WhatsApp Share Button -->
-      <button onclick="shareOnWhatsApp()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold flex items-center shadow transition">
-        <i data-lucide="message-circle" class="w-3.5 h-3.5 mr-1.5"></i> Share on WhatsApp
-      </button>
-
       <button onclick="newBill()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded text-xs font-semibold flex items-center border border-gray-600 transition">
         <i data-lucide="file-plus" class="w-3.5 h-3.5 mr-1"></i> New Bill
       </button>
@@ -299,7 +294,6 @@
     }
 
     function onBillNoManualChange(val) {
-      // If user manually types a custom number, update sequence tracker to match it
       const match = val.match(/\d+$/);
       if (match) {
         const num = parseInt(match[0], 10);
@@ -494,49 +488,6 @@
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       html2pdf().set(opt).from(element).save();
-    }
-
-    function shareOnWhatsApp() {
-      const custRaw = document.getElementById('custNamePhone').value;
-      const billNo = document.getElementById('billNo').value;
-      const date = document.getElementById('billDate').value;
-      const grandTotal = document.getElementById('pvGrandTotal').textContent;
-      const oldBal = document.getElementById('pvOldBalance').textContent;
-      const netBal = document.getElementById('pvNetBalance').textContent;
-
-      const phoneMatch = custRaw.match(/\b[6789]\d{9}\b/);
-      let phone = phoneMatch ? phoneMatch[0] : "";
-
-      if (!phone) {
-        phone = prompt("Please enter the 10-digit mobile number for WhatsApp:", "");
-        if (!phone) return;
-      }
-
-      let itemsText = "";
-      items.forEach((item, index) => {
-        if (item.name) {
-          const rowTotal = ((item.qty || 0) * (item.rate || 0)).toFixed(2);
-          itemsText += `${index + 1}. *${item.name}*\n   Qty: ${item.qty} | Rate: ₹${item.rate} | Total: ₹${rowTotal}\n`;
-        }
-      });
-
-      const message = 
-`*EXPERT LIGHT - Debit Memo*
-----------------------------------------
-*Invoice No:* ${billNo}
-*Date:* ${date}
-*Customer:* ${custRaw}
-----------------------------------------
-*Items Summary:*
-${itemsText}----------------------------------------
-*This Bill:* ₹${grandTotal}
-*Old Balance:* ₹${oldBal} DB
-*Net Balance Due:* ₹${netBal} DB
-----------------------------------------
-Thank you for your business!`;
-
-      const waUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
-      window.open(waUrl, '_blank');
     }
 
     window.onload = () => {
