@@ -82,7 +82,7 @@
         </h2>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Customer Name & Phone (M/s.)</label>
-          <input type="text" id="custNamePhone" value="HARSHBHAI VAISHNAV - 9662009413" class="w-full text-xs p-2 border border-gray-300 rounded font-bold uppercase focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
+          <input type="text" id="custNamePhone" value="" placeholder="e.g. HARSHBHAI VAISHNAV - 9662009413" class="w-full text-xs p-2 border border-gray-300 rounded font-bold uppercase focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Location / City</label>
@@ -90,8 +90,8 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">No.</label>
-            <input type="text" id="billNo" value="EEL-2674" class="w-full text-xs p-2 border border-gray-300 rounded font-semibold focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
+            <label class="block text-xs font-semibold text-gray-600 mb-1">No. (Auto Sequence)</label>
+            <input type="text" id="billNo" value="EEL-0001" class="w-full text-xs p-2 border border-gray-300 rounded font-semibold focus:ring-1 focus:ring-black outline-none" oninput="onBillNoManualChange(this.value)" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Date (Auto Live)</label>
@@ -101,7 +101,7 @@
         <div class="grid grid-cols-2 gap-3 pt-2 border-t">
           <div>
             <label class="block text-[11px] font-semibold text-gray-600 mb-1">Old Balance (DB)</label>
-            <input type="number" step="any" id="oldBalance" value="46.00" class="w-full text-xs p-2 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
+            <input type="number" step="any" id="oldBalance" value="0.00" class="w-full text-xs p-2 border border-gray-300 rounded font-medium focus:ring-1 focus:ring-black outline-none" oninput="saveAndRender()" />
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-gray-600 mb-1">Note Remark</label>
@@ -273,6 +273,41 @@
       { name: "RGB ROPE LED LIGHT", qty: 1.000, rate: 260.00 }
     ];
 
+    // ==========================================
+    // BILL SEQUENCE ENGINE (STARTS FROM 1)
+    // ==========================================
+    const BILL_PREFIX = "EEL-";
+
+    function getFormattedBillNo(num) {
+      return BILL_PREFIX + String(num).padStart(4, '0');
+    }
+
+    function getCurrentSequenceNumber() {
+      const stored = localStorage.getItem('expert_light_seq_num');
+      if (!stored) {
+        localStorage.setItem('expert_light_seq_num', '1');
+        return 1;
+      }
+      return parseInt(stored, 10) || 1;
+    }
+
+    function incrementSequenceNumber() {
+      const current = getCurrentSequenceNumber();
+      const next = current + 1;
+      localStorage.setItem('expert_light_seq_num', next.toString());
+      return next;
+    }
+
+    function onBillNoManualChange(val) {
+      // If user manually types a custom number, update sequence tracker to match it
+      const match = val.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        localStorage.setItem('expert_light_seq_num', num.toString());
+      }
+      saveAndRender();
+    }
+
     // Populate Datalist
     function setupCatalogList() {
       const datalist = document.getElementById('catalogList');
@@ -313,15 +348,11 @@
       return intVal === 0 ? 'Zero Only' : inWords(intVal) + ' Only';
     }
 
-    // Handle typing and catalog autofill
     function handleProductNameInput(index, val) {
       items[index].name = val;
-      
-      // Check if typed value matches a catalog item
       const matched = PRODUCT_CATALOG.find(p => p.name.toLowerCase() === val.trim().toLowerCase());
       if (matched) {
         items[index].rate = matched.rate;
-        // Update input field on UI
         const rateInput = document.getElementById(`item-rate-${index}`);
         if (rateInput) rateInput.value = matched.rate;
       }
@@ -439,13 +470,10 @@
       document.getElementById('pvNetBalance').textContent = netBal.toFixed(2);
     }
 
+    // Increments to the next sequential bill number (1 -> 2 -> 3...)
     function newBill() {
-      const curNo = document.getElementById('billNo').value;
-      const match = curNo.match(/^(.*?)(\d+)$/);
-      if (match) {
-        const nextNum = parseInt(match[2], 10) + 1;
-        document.getElementById('billNo').value = `${match[1]}${nextNum}`;
-      }
+      const nextSeq = incrementSequenceNumber();
+      document.getElementById('billNo').value = getFormattedBillNo(nextSeq);
       document.getElementById('billDate').value = getTodayFormatted();
       document.getElementById('custNamePhone').value = "";
       document.getElementById('oldBalance').value = "0.00";
@@ -516,13 +544,17 @@ Thank you for your business!`;
       const today = getTodayFormatted();
       document.getElementById('billDate').value = today;
 
+      // Initialize sequential bill number
+      const seq = getCurrentSequenceNumber();
+      document.getElementById('billNo').value = getFormattedBillNo(seq);
+
       const saved = localStorage.getItem('expert_light_last_bill');
       if (saved) {
         try {
           const d = JSON.parse(saved);
           document.getElementById('custNamePhone').value = d.name || '';
           document.getElementById('custCity').value = d.city || 'RAJKOT';
-          document.getElementById('billNo').value = d.billNo || 'EEL-2674';
+          if (d.billNo) document.getElementById('billNo').value = d.billNo;
           document.getElementById('oldBalance').value = d.oldBal || '0.00';
           document.getElementById('memoNote').value = d.note || '';
           document.getElementById('billDate').value = today;
